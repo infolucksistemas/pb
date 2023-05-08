@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"google.golang.org/grpc"
 
-	"infoluckweb-catalog/pb"
+	"github.com/infolucksistemas/pb"
 )
 
 const address = "localhost:50051"
