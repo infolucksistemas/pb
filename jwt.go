@@ -1,4 +1,4 @@
-package middleware
+package pb
 
 import (
 	"context"
@@ -6,8 +6,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"google.golang.org/grpc"
-
-	"github.com/infolucksistemas/pb"
 )
 
 const address = "localhost:50051"
@@ -26,7 +24,7 @@ func JWTMiddleware() fiber.Handler {
 		defer conn.Close()
 
 		// Crie um cliente gRPC para o serviço de validação de token JWT
-		client := pb.NewTokenServiceClient(conn)
+		client := NewTokenServiceClient(conn)
 
 		// Obtenha o token JWT da solicitação
 		token := ctx.Get("Authorization")
@@ -37,7 +35,7 @@ func JWTMiddleware() fiber.Handler {
 		}
 
 		// Chame o serviço de validação de token JWT para verificar se o token é válido
-		resp, err := client.ValidateToken(context.Background(), &pb.ValidateTokenRequest{Token: token})
+		resp, err := client.ValidateToken(context.Background(), &ValidateTokenRequest{Token: token})
 		if err != nil {
 			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"message": fmt.Sprintf("%v", err),
