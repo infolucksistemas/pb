@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/infolucksistemas"
+	"github.com/infolucksistemas/pb"
 	"google.golang.org/grpc"
 )
 
