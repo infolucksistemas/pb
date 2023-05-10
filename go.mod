@@ -1,4 +1,4 @@
-module github.com/infolucksistemas/pb
+module github.com/infolucksistemas
 
 go 1.20
 

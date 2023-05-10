@@ -1,20 +1,21 @@
-package pb
+package middleware
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/infolucksistemas/pb"
 	"google.golang.org/grpc"
 )
 
-const address = "localhost:50051"
+const address = "localhost:9000"
 
 // Crie um novo middleware de validação de token JWT
 func JWTMiddleware() fiber.Handler {
 
 	// Retorne o middleware de validação de token JWT
-	return func(ctx *fiber.Ctx) error {
+	return func(c *fiber.Ctx) error {
 
 		// Crie uma conexão gRPC para o serviço de validação de token JWT
 		conn, err := grpc.Dial(address, grpc.WithInsecure())
@@ -24,34 +25,35 @@ func JWTMiddleware() fiber.Handler {
 		defer conn.Close()
 
 		// Crie um cliente gRPC para o serviço de validação de token JWT
-		client := NewTokenServiceClient(conn)
+		client := pb.NewTokenServiceClient(conn)
 
 		// Obtenha o token JWT da solicitação
-		token := ctx.Get("Authorization")
+		token := c.Get("Authorization")
 		if token == "" {
-			return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"message": "Authorization token not found",
 			})
 		}
 
 		// Chame o serviço de validação de token JWT para verificar se o token é válido
-		resp, err := client.ValidateToken(context.Background(), &ValidateTokenRequest{Token: token})
+		resp, err := client.ValidateToken(context.Background(), &pb.ValidateTokenRequest{Token: token})
 		if err != nil {
-			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"message": fmt.Sprintf("%v", err),
 			})
-
 		}
 
 		// Se o token não for válido, retorne uma resposta de erro
 		if !resp.Valid {
-			return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"message": "Invalid authorization token",
 			})
+		} else {
+			c.Locals("db", resp.Dados)
 		}
 
 		// Se o token for válido, continue com o manipulador da rota
-		return ctx.Next()
+		return c.Next()
 	}
 
 }
