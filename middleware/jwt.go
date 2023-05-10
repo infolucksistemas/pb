@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-const address = "localhost:50051"
+const address = "localhost:9000"
 
 // Crie um novo middleware de validação de token JWT
 func JWTMiddleware() fiber.Handler {
@@ -41,7 +41,6 @@ func JWTMiddleware() fiber.Handler {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"message": fmt.Sprintf("%v", err),
 			})
-
 		}
 
 		// Se o token não for válido, retorne uma resposta de erro
@@ -50,7 +49,6 @@ func JWTMiddleware() fiber.Handler {
 				"message": "Invalid authorization token",
 			})
 		} else {
-
 			c.Locals("db", resp.Dados)
 		}
 
